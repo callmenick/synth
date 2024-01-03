@@ -1,4 +1,4 @@
-import './globals.css'
+import { Providers } from './providers'
 
 export const metadata = {
   title: 'Create Next App',
@@ -8,7 +8,9 @@ export const metadata = {
 function RootLayout({ children }): JSX.Element {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   )
 }

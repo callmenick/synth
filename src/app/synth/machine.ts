@@ -1,6 +1,3 @@
-'use client'
-
-import { useMachine } from '@xstate/react'
 import { assertEvent, assign, setup } from 'xstate'
 
 const synthMachine = setup({
@@ -72,46 +69,4 @@ const synthMachine = setup({
   },
 })
 
-function Synth(): JSX.Element {
-  const [state, send] = useMachine(synthMachine)
-
-  return (
-    <div>
-      {state.matches('idle') && (
-        <button
-          onClick={(e) => {
-            e.preventDefault()
-            send({
-              type: 'start',
-            })
-          }}
-        >
-          power on
-        </button>
-      )}
-
-      {state.matches('running') && (
-        <button
-          onMouseDown={(e) => {
-            e.preventDefault()
-            send({
-              type: 'toggle',
-              params: { on: true },
-            })
-          }}
-          onMouseUp={(e) => {
-            e.preventDefault()
-            send({
-              type: 'toggle',
-              params: { on: false },
-            })
-          }}
-        >
-          play note
-        </button>
-      )}
-    </div>
-  )
-}
-
-export default Synth
+export default synthMachine

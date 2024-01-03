@@ -1,14 +1,19 @@
 import { Fragment } from 'react'
-import Synth from './synth'
+import Synth from './synth/index'
+import { Container, Heading } from '@chakra-ui/react'
 
 function Home(): JSX.Element {
   return (
     <Fragment>
       <header>
-        <h1>Web Synth</h1>
+        <Container>
+          <Heading>Synth</Heading>
+        </Container>
       </header>
       <main>
-        <Synth />
+        <Container>
+          <Synth />
+        </Container>
       </main>
     </Fragment>
   )
