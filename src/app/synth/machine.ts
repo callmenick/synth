@@ -7,8 +7,21 @@ const synthMachine = setup({
       gainNode: null | GainNode
       oscillatorNode: null | OscillatorNode
     }
-    events: { type: 'start' } | { type: 'toggle'; params: { on: boolean } }
-    actions: { type: 'start' } | { type: 'play' }
+    events:
+      | {
+          type: 'start'
+        }
+      | {
+          type: 'toggleOn'
+          params: {
+            frequency: number
+          }
+        }
+      | {
+          type: 'toggleOff'
+          params: {}
+        }
+    actions: { type: 'start' }
   },
   actions: {
     start: assign(({ context, event }) => {
@@ -16,30 +29,38 @@ const synthMachine = setup({
 
       const actx = new AudioContext()
       const gainNode = actx.createGain()
-      const oscillator = actx.createOscillator()
+      const oscillatorNode = actx.createOscillator()
 
       gainNode.gain.setValueAtTime(0, actx.currentTime)
-      oscillator.connect(gainNode).connect(actx.destination)
-      oscillator.start()
+      oscillatorNode.connect(gainNode).connect(actx.destination)
+      oscillatorNode.start()
 
       return {
         ...context,
         actx,
         gainNode,
-        oscillator,
+        oscillatorNode,
       }
     }),
-    toggle: ({ context, event }) => {
-      assertEvent(event, 'toggle')
+    toggleOn: ({ context, event }) => {
+      assertEvent(event, 'toggleOn')
 
-      const { actx, gainNode } = context
-      const on = event.params.on
+      const { actx, gainNode, oscillatorNode } = context
+      const { frequency } = event.params
 
-      if (!actx || !gainNode) return
+      if (!actx || !gainNode || !oscillatorNode) return
 
-      on
-        ? gainNode.gain.setValueAtTime(1, actx.currentTime)
-        : gainNode.gain.setValueAtTime(0, actx.currentTime)
+      oscillatorNode.frequency.setValueAtTime(frequency, actx.currentTime)
+      gainNode.gain.setValueAtTime(1, actx.currentTime)
+    },
+    toggleOff: ({ context, event }) => {
+      assertEvent(event, 'toggleOff')
+
+      const { actx, gainNode, oscillatorNode } = context
+
+      if (!actx || !gainNode || !oscillatorNode) return
+
+      gainNode.gain.setValueAtTime(0, actx.currentTime)
     },
   },
 }).createMachine({
@@ -61,8 +82,11 @@ const synthMachine = setup({
     },
     running: {
       on: {
-        toggle: {
-          actions: 'toggle',
+        toggleOn: {
+          actions: 'toggleOn',
+        },
+        toggleOff: {
+          actions: 'toggleOff',
         },
       },
     },

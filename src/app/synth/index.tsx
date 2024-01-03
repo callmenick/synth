@@ -3,9 +3,29 @@
 import { useMachine } from '@xstate/react'
 import synthMachine from './machine'
 import { Button } from '@chakra-ui/react'
+import { notes } from './constants'
+import Key from './key'
+import { useCallback, useEffect } from 'react'
 
 function Synth(): JSX.Element {
   const [state, send] = useMachine(synthMachine)
+
+  const toggleOn = useCallback(
+    (frequency: number) => {
+      send({
+        type: 'toggleOn',
+        params: { frequency },
+      })
+    },
+    [send]
+  )
+
+  const toggleOff = useCallback(() => {
+    send({
+      type: 'toggleOff',
+      params: {},
+    })
+  }, [send])
 
   return (
     <div>
@@ -23,24 +43,16 @@ function Synth(): JSX.Element {
       )}
 
       {state.matches('running') && (
-        <Button
-          onMouseDown={(e) => {
-            e.preventDefault()
-            send({
-              type: 'toggle',
-              params: { on: true },
-            })
-          }}
-          onMouseUp={(e) => {
-            e.preventDefault()
-            send({
-              type: 'toggle',
-              params: { on: false },
-            })
-          }}
-        >
-          play note
-        </Button>
+        <div>
+          {notes.map((note) => (
+            <Key
+              key={note.key}
+              note={note}
+              toggleOn={toggleOn}
+              toggleOff={toggleOff}
+            />
+          ))}
+        </div>
       )}
     </div>
   )
