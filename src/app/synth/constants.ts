@@ -1,9 +1,9 @@
-type Note = {
+export type Note = {
   key: string
   frequency: number
 }
 
-export const notes: Array<Note> = [
+export const notes: Note[] = [
   {
     key: 'C4',
     frequency: 261.63,

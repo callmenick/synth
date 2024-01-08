@@ -2,7 +2,7 @@ import { Fragment } from 'react'
 import Synth from './synth/index'
 import { Container, Heading } from '@chakra-ui/react'
 
-function Home(): JSX.Element {
+function Home() {
   return (
     <Fragment>
       <header>

@@ -1,55 +1,53 @@
 'use client'
 
-import { useMachine } from '@xstate/react'
-import synthMachine from './machine'
 import { Button } from '@chakra-ui/react'
 import { notes } from './constants'
 import Key from './key'
-import { useCallback, useEffect } from 'react'
+import { useReducer } from 'react'
+import { initialSnapshot, reducer } from './reducer'
 
-function Synth(): JSX.Element {
-  const [state, send] = useMachine(synthMachine)
-
-  const toggleOn = useCallback(
-    (frequency: number) => {
-      send({
-        type: 'toggleOn',
-        params: { frequency },
-      })
-    },
-    [send]
-  )
-
-  const toggleOff = useCallback(() => {
-    send({
-      type: 'toggleOff',
-      params: {},
-    })
-  }, [send])
+function Synth() {
+  const [snapshot, dispatch] = useReducer(reducer, initialSnapshot)
 
   return (
     <div>
-      {state.matches('idle') && (
-        <Button
-          onClick={(e) => {
-            e.preventDefault()
-            send({
-              type: 'start',
-            })
-          }}
-        >
-          power on
-        </Button>
+      {snapshot.state === 'idle' && (
+        <div>
+          <Button
+            onClick={(e) => {
+              dispatch({
+                type: 'START',
+              })
+            }}
+          >
+            power on
+          </Button>
+        </div>
       )}
 
-      {state.matches('running') && (
+      {snapshot.state === 'running' && (
         <div>
           {notes.map((note) => (
             <Key
               key={note.key}
               note={note}
-              toggleOn={toggleOn}
-              toggleOff={toggleOff}
+              toggleOn={(frequency) => {
+                dispatch({
+                  type: 'TOGGLE_NOTE',
+                  params: {
+                    on: true,
+                    frequency,
+                  },
+                })
+              }}
+              toggleOff={() => {
+                dispatch({
+                  type: 'TOGGLE_NOTE',
+                  params: {
+                    on: false,
+                  },
+                })
+              }}
             />
           ))}
         </div>
